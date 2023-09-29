@@ -1,5 +1,6 @@
 package com.offbyabit.codeforces.ui.screens
 
+import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -16,11 +17,7 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,19 +32,17 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import coil.compose.AsyncImagePainter
-import coil.transform.CircleCropTransformation
-import com.offbyabit.codeforces.utils.models.CodeForcesAPI
+import com.offbyabit.codeforces.ui.viewmodels.HomeVM
 import com.offbyabit.codeforces.utils.models.Rank
 import com.offbyabit.codeforces.utils.models.annotateAsHandle
 import com.offbyabit.codeforces.utils.models.annotateAsRank
 import com.offbyabit.codeforces.utils.models.annotateRank
 import com.offbyabit.codeforces.utils.models.getKeyColor
 import com.offbyabit.codeforces.utils.models.getRank
-import com.offbyabit.codeforces.utils.models.userInfo.UserInfo
-import com.offbyabit.codeforces.utils.models.userRatings.UserRatings
 import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
 import com.patrykandpatrick.vico.compose.chart.Chart
@@ -58,65 +53,27 @@ import com.patrykandpatrick.vico.compose.style.ProvideChartStyle
 import com.patrykandpatrick.vico.core.DefaultAlpha
 import com.patrykandpatrick.vico.core.DefaultColors
 import com.patrykandpatrick.vico.core.DefaultDimens
-import com.patrykandpatrick.vico.core.axis.formatter.AxisValueFormatter
 import com.patrykandpatrick.vico.core.chart.line.LineChart
 import com.patrykandpatrick.vico.core.component.shape.LineComponent
 import com.patrykandpatrick.vico.core.component.shape.Shapes
 import com.patrykandpatrick.vico.core.component.shape.shader.DynamicShaders
 import com.patrykandpatrick.vico.core.entry.entryModelOf
 import com.patrykandpatrick.vico.core.entry.entryOf
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 @Composable
-fun Home(navController: NavController) {
-    val retrofit = Retrofit.Builder()
-        .baseUrl("https://codeforces.com/api/")
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-    val apiService = retrofit.create(CodeForcesAPI::class.java)
-    val networkScope = CoroutineScope(Dispatchers.IO)
-
-    val handle = "YouKn0wWho"
-
-    var userInfo by remember { mutableStateOf<UserInfo?>(null) }
-    var userRatings by remember { mutableStateOf<UserRatings?>(null) }
-    LaunchedEffect(true) {
-        // user info
-        networkScope.launch {
-            try {
-                val x = apiService.getUserInfo(handle)
-                if (x.status == "OK") {
-                    userInfo = x
-                }
-            } catch (_: Exception) {
-            }
-        }
-
-        // user ratings
-        networkScope.launch {
-            try {
-                val x = apiService.getUserRatings(handle)
-                if (x.status == "OK") {
-                    userRatings = x
-                }
-            } catch (_: Exception) {
-            }
-        }
-    }
-
+fun Home(
+    viewModel: HomeVM,
+    navController: NavController
+) {
     var color = Color.White
 
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(32.dp)
     ) {
-        if (userInfo != null) {
-            if (userInfo!!.status == "OK") {
-                val result = userInfo!!.result[0]
+        if (viewModel.userInfo != null) {
+            if (viewModel.userInfo!!.status == "OK") {
+                val result = viewModel.userInfo!!.result[0]
                 val rank = result.rank.getRank()
                 color = rank.getKeyColor()
 
@@ -212,9 +169,9 @@ fun Home(navController: NavController) {
             }
         }
 
-        if (userRatings != null) {
-            if (userRatings!!.status == "OK") {
-                val ratings = userRatings!!.result
+        if (viewModel.userRatings != null) {
+            if (viewModel.userRatings!!.status == "OK") {
+                val ratings = viewModel.userRatings!!.result
                 val l = ratings.mapIndexed { index, m ->
                     entryOf(index, m.newRating)
                 }

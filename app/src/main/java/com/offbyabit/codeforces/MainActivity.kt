@@ -3,6 +3,7 @@ package com.offbyabit.codeforces
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -34,14 +35,18 @@ import com.offbyabit.codeforces.ui.screens.Home
 import com.offbyabit.codeforces.ui.screens.Navigation
 import com.offbyabit.codeforces.ui.screens.Screen
 import com.offbyabit.codeforces.ui.theme.CodeforcesUOTheme
+import com.offbyabit.codeforces.ui.viewmodels.HomeVM
 import com.offbyabit.codeforces.utils.models.CodeForcesAPI
 import com.offbyabit.codeforces.utils.models.userInfo.UserInfo
+import com.tencent.mmkv.MMKV
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            MMKV.initialize(this)
+
             CodeforcesUOTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),

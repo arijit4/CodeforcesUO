@@ -3,12 +3,20 @@ package com.offbyabit.codeforces.ui.screens
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.offbyabit.codeforces.ui.viewmodels.ContestsVM
+import com.offbyabit.codeforces.ui.viewmodels.HomeVM
+import com.offbyabit.codeforces.ui.viewmodels.SettingsVM
 
 @Composable
 fun Navigation(navController: NavHostController) {
+    val homeVM = viewModel<HomeVM>()
+    val contestsVM = viewModel<ContestsVM>()
+    val settingsVM = viewModel<SettingsVM>()
+
     NavHost(navController = navController, startDestination = Screen.HomeScreen.route) {
         composable(
             route = Screen.HomeScreen.route,
@@ -25,14 +33,17 @@ fun Navigation(navController: NavHostController) {
                 )
             }
         ) {
-            Home(navController)
+            Home(
+                viewModel = homeVM,
+                navController = navController
+            )
         }
         composable(
             route = Screen.ContestScreen.route,
             enterTransition = {
                 slideIntoContainer(
                     AnimatedContentTransitionScope.SlideDirection.run {
-                        when(navController.previousBackStackEntry?.destination?.route) {
+                        when (navController.previousBackStackEntry?.destination?.route) {
                             Screen.SettingsScreen.route -> Right
                             else -> Left
                         }
@@ -52,7 +63,10 @@ fun Navigation(navController: NavHostController) {
                 )
             }
         ) {
-            Contest(navController)
+            Contest(
+                viewModel = contestsVM,
+                navController = navController
+            )
         }
         composable(
             route = Screen.SettingsScreen.route,
@@ -69,7 +83,10 @@ fun Navigation(navController: NavHostController) {
                 )
             }
         ) {
-            Settings(navController)
+            Settings(
+                viewModel = settingsVM,
+                navController = navController
+            )
         }
     }
 }

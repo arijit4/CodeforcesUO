@@ -14,51 +14,23 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.offbyabit.codeforces.utils.models.CodeForcesAPI
-import com.offbyabit.codeforces.utils.models.contestList.ContestList
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.offbyabit.codeforces.ui.viewmodels.ContestsVM
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.datetime.toLocalDateTime
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Contest(navController: NavController) {
-    val retrofit = Retrofit.Builder()
-        .baseUrl("https://codeforces.com/api/")
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-    val apiService = retrofit.create(CodeForcesAPI::class.java)
-    val networkScope = CoroutineScope(Dispatchers.IO)
-
-    var contestList by remember { mutableStateOf<ContestList?>(null) }
-    LaunchedEffect(true) {
-        networkScope.launch {
-            try {
-                val x = apiService.getContestList()
-                if (x.status == "OK") {
-                    contestList = x
-                }
-            } catch (_: Exception) {
-            }
-        }
-    }
+fun Contest(
+    viewModel: ContestsVM,
+    navController: NavController
+) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -71,18 +43,9 @@ fun Contest(navController: NavController) {
             modifier = Modifier.padding(it),
             verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
-//            Text(
-//                modifier = Modifier.padding(
-//                    start = 32.dp,
-//                    top = 32.dp
-//                ),
-//                text = "Contests",
-//                fontFamily = FontFamily.Monospace,
-//                style = MaterialTheme.typography.titleLarge
-//            )
-            if (contestList != null) {
-                if (contestList!!.status == "OK") {
-                    val contests = contestList!!.result
+            if (viewModel.contestList != null) {
+                if (viewModel.contestList!!.status == "OK") {
+                    val contests = viewModel.contestList!!.result
                     LazyColumn(
                         modifier = Modifier.fillMaxSize()
 
