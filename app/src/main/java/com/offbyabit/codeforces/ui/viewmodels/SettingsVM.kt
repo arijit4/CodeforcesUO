@@ -17,6 +17,7 @@ class SettingsVM : ViewModel() {
     fun changeHandle(handle: String) {
         val kv = MMKV.defaultMMKV()
         kv.encode("handle", handle)
+//        kv.encode("key_color", handle)
     }
 
     fun checkIfHandleIsValid(handle: String) {

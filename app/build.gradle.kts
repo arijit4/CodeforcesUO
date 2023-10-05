@@ -87,4 +87,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0-alpha02")
 
     implementation("com.tencent:mmkv:1.3.1")
+
+    implementation("com.github.Kyant0:m3color:2023.8.1")
 }

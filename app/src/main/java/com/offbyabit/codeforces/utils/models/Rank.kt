@@ -72,10 +72,11 @@ fun Rank.getColor(): Color {
     }
 }
 
-@Composable
-fun Rank.getKeyColor(): Color {
+fun Rank.getKeyColor(
+    officialColor: Color? = null
+): Color {
     return when (this) {
-        Rank.Official -> MaterialTheme.colorScheme.onSurface
+        Rank.Official -> officialColor ?: Color.White
         Rank.Newbie -> Colors.Newbie
         Rank.Pupil -> Colors.Pupil
         Rank.Apprentice -> Colors.Apprentice

@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import com.offbyabit.codeforces.ui.viewmodels.ContestsVM
 import com.offbyabit.codeforces.ui.viewmodels.HomeVM
 import com.offbyabit.codeforces.ui.viewmodels.SettingsVM
+import com.tencent.mmkv.MMKV
 
 @Composable
 fun Navigation(navController: NavHostController) {
@@ -33,7 +34,9 @@ fun Navigation(navController: NavHostController) {
                 )
             }
         ) {
+            val handle = (MMKV.defaultMMKV().decodeString("handle") ?: "YouKn0wWho")
             Home(
+                handle = handle,
                 viewModel = homeVM,
                 navController = navController
             )

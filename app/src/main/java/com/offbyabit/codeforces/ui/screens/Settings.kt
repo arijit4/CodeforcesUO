@@ -29,6 +29,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.offbyabit.codeforces.ui.viewmodels.SettingsVM
+import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -79,7 +80,11 @@ fun ChangeHandleDialog(
     viewModel: SettingsVM,
     onDismiss: () -> Unit
 ) {
-    var handle by remember { mutableStateOf("") }
+    var handle by remember {
+        mutableStateOf(
+            MMKV.defaultMMKV().decodeString("handle") ?: "YouKn0wWho"
+        )
+    }
 
     AlertDialog(
         onDismissRequest = {

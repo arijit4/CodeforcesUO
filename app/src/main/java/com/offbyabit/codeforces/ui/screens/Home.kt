@@ -1,6 +1,5 @@
 package com.offbyabit.codeforces.ui.screens
 
-import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -17,6 +16,8 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,13 +28,13 @@ import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.offbyabit.codeforces.ui.viewmodels.HomeVM
@@ -59,13 +60,19 @@ import com.patrykandpatrick.vico.core.component.shape.Shapes
 import com.patrykandpatrick.vico.core.component.shape.shader.DynamicShaders
 import com.patrykandpatrick.vico.core.entry.entryModelOf
 import com.patrykandpatrick.vico.core.entry.entryOf
+import com.tencent.mmkv.MMKV
 
 @Composable
 fun Home(
+    handle: String,
     viewModel: HomeVM,
     navController: NavController
 ) {
     var color = Color.White
+
+    if (handle != viewModel.handle) {
+        viewModel.handle = handle
+    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -141,19 +148,32 @@ fun Home(
                         ConditionalText(
                             annotatedValue = buildAnnotatedString {
                                 append("Rating: ")
-                                append(
-                                    result.rating.toString()
-                                        .annotateAsRank(rank)
-                                )
+                                withStyle(
+                                    style = SpanStyle(
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                ) {
+                                    append(
+                                        result.rating.toString()
+                                            .annotateAsRank(rank)
+                                    )
+                                }
                             }
                         )
                         ConditionalText(
                             annotatedValue = buildAnnotatedString {
                                 append("Contribution: ")
-                                append(
-                                    result.contribution.toString()
-                                        .annotateAsHandle(r = Rank.Pupil) // for green color
-                                )
+                                withStyle(
+                                    style = SpanStyle(
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                ) {
+                                    append(
+                                        result.contribution
+                                            .run { if (this > 0) "+$this" else "$this" }
+                                            .annotateAsHandle(r = Rank.Pupil) // for green color
+                                    )
+                                }
                             }
                         )
                         ConditionalText(

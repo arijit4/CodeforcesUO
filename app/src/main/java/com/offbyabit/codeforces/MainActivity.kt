@@ -1,19 +1,19 @@
 package com.offbyabit.codeforces
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.ReceiptLong
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -23,22 +23,29 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.compose.rememberNavController
-import com.offbyabit.codeforces.ui.screens.Home
 import com.offbyabit.codeforces.ui.screens.Navigation
 import com.offbyabit.codeforces.ui.screens.Screen
 import com.offbyabit.codeforces.ui.theme.CodeforcesUOTheme
-import com.offbyabit.codeforces.ui.viewmodels.HomeVM
-import com.offbyabit.codeforces.utils.models.CodeForcesAPI
-import com.offbyabit.codeforces.utils.models.userInfo.UserInfo
+import com.offbyabit.codeforces.utils.models.Constants
+import com.offbyabit.codeforces.utils.models.Rank
+import com.offbyabit.codeforces.utils.models.RankStrings
+import com.offbyabit.codeforces.utils.models.getKeyColor
+import com.offbyabit.codeforces.utils.models.getRank
 import com.tencent.mmkv.MMKV
+
+lateinit var themeChangeCount: MutableState<Int>
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -47,7 +54,22 @@ class MainActivity : ComponentActivity() {
         setContent {
             MMKV.initialize(this)
 
-            CodeforcesUOTheme {
+            themeChangeCount = remember { mutableIntStateOf(0) }
+
+            var keyColor by remember { mutableStateOf(Color.White) }
+
+            LaunchedEffect(key1 = themeChangeCount.value) {
+                val rankName = MMKV.defaultMMKV().decodeString(
+                    Constants.PrefTags.rankName,
+                    RankStrings.Master
+                )
+                Log.d("theme-debug", rankName.toString())
+                keyColor = rankName.getRank().getKeyColor()
+            }
+
+            CodeforcesUOTheme(
+                keyColor = keyColor
+            ) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -112,8 +134,8 @@ private val navigationItems = listOf(
     ),
     NavigationItem(
         title = "Contests",
-        selectedIcon = Icons.Filled.Warning,
-        unselectedIcon = Icons.Outlined.Warning,
+        selectedIcon = Icons.Filled.ReceiptLong,
+        unselectedIcon = Icons.Outlined.ReceiptLong,
         route = Screen.ContestScreen.route
     ),
     NavigationItem(
